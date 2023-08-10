@@ -294,7 +294,7 @@
 
 ## data flows down
 
-# handling eventslllllllllllllllll
+# handling events
 
         các event viết trong {}
         dùng preventDefault(): chặn các hành động mặc định
@@ -1756,3 +1756,100 @@ https://devdocs.io/
 
         // RECAP
             hạn chế mutate object
+
+
+=========
+create and nest components
+add markup and style
+display data
+render conditions and lists
+response to event and update the screen
+share data between components
+=================
+// create component
+- react apps được tạo ra bởi nhiều components
+- component là 1 phần của UI có logic và appearance riêng
+- VD: có 1 function -> khai báo fn đó, lồng vào 1 component khác 
+    function Info(){
+        return (
+            <button>I'm button</button>
+        )
+    }
+    ----------
+    export default function App(){
+        return (
+            <div>
+                <Info />
+            </div>
+        )
+    }
+
+- tên của component luôn luôn phải viết hoa chữ cái đầu
+- export default dùng để chỉ ra đâu là component chính của file
+
+// add markup and styles
+- jsx nó chặt chẻ hơn html
+- component không thể return nhiều jsx tags, mà phải bọc chúng trong "shared parent" như là <div></div> or <></>
+- dùng className giống như HTML class attribute
+
+// display data
+- dùng {...data} để hiển thị dữ liệu
+- {user.name}
+
+// conditional render
+- trong react ko có syntax đặc biệt cho việc viết câu điều kiện
+- thay vào đó các syntaxx như JS thông thường (if,else)
+
+// render list
+- phụ thuộc vào "for loop" và "array map"
+
+const listItems = products.map(product =>
+  <li key={product.id}>
+    {product.title}
+  </li>
+);
+
+return (
+  <ul>{listItems}</ul>
+);
+- key ở đây có thể là string or number uniquely dùng để định danh cho nó so với các item cùng cấp
+    - thông thường thì key là ID trong database
+    - react dùng key để xác định chuyện gì sẽ xảy ra với item đó (thêm, xóa, sửa,...)
+
+// response to event
+- có thể response event khi khai báo event handle fn torng components
+    fn Something(){
+        fn handleClick(){
+            alter('you clicked me!')
+        }
+        return (
+            <button onClick={handleClick}>click here</button>
+        )
+    }
+    - lưu ý: handleClick không có () ở cuối vì chỉ cần truyền xuống. react sẻ gọi khi click vào button.
+
+// update the screen
+- khi muốn component nhớ 1 vài thông tin nào đó và hiển thị lên screen
+thì dùng useState
+- const [count, setCount] = useState(0);
+    + state hiện tại: count
+    + fn update state: setCount
+    + lần đầu display thi dùng giá trị default (0) đã khai báo trước
+    + mỗi button sẽ có 1 state khác nhau và ko ảnh hưởng đến nhau
+
+// hook
+- fn mà bắt đầu = "use" được gọi là hook
+    + build-in hook
+    + custom hook = combining những hook khác
+    + hook sẽ bị hạn chế hơn fn, chỉ có thể gọi hook ở đầu component
+
+// share data giữa các components
+- cho 1 thằng cha giữ giá trị cần hiển thị và chỉ thay đổi giá trị ơ đây
+- truyền từ cha xuống con g/trị cần hiển thị
+- khi mà giá trị thay đổi ở cha thì g/trị ở con cũng thay đổi
+
+
+
+
+
+

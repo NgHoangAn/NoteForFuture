@@ -1,7 +1,5 @@
-=====================================
+# ===============
 -------------Variable----------------
-=====================================
-
 # variable
 
 ## basic
@@ -21,14 +19,10 @@
     + có thể khai báo lại 1 biến với var (ko thể với let, const)
 
 ## let
-
     + ko thể khai báo lại
-
     + phải khai báo trước khi dùng
         + dùng trước khi khai báo thì error "ReferenceError"
-
     + phạm vi là block ( { block } )
-
 ## const
 
     + ko thể khai báo lại
