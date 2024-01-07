@@ -73,7 +73,7 @@
 # padding
   + tạo k/trắng bện trong element
 
-  + dùng box-sizing: border-box để giữ nguyên width element (ko phụ thuộc vào pading, border, margin)
+  + dùng box-sizing: border-box để giữ nguyên width element (ko phụ thuộc vào padding, border, margin)
 
 # height/width
 	+ max-width: chiều aco tối đa của element
@@ -131,7 +131,7 @@
 # font
   + types:
 	+ serif : có nét nhỏ ở các cạnh mỗi chữ
-	+ sans-serif: clear các nét nhỏ -> tối giản (recomment)
+	+ sans-serif: clear các nét nhỏ -> tối giản (recommend)
 	+ monospace: robot chữ
 	+ cursive: same viết tay
 	+ fantasy: decor-fun
@@ -159,7 +159,8 @@
 	left
 	right
 	none
-	khi dùng float thì phần nối tiếp với thẻ chứa thẻ float sẻ bị thẻ float đè lên()-> dùng overflow:hidden trong thẻ cha chừa float
+	khi dùng float thì phần nối tiếp với thẻ chứa thẻ float sẻ bị thẻ float đè lên
+  ()-> dùng overflow:hidden trong thẻ cha chừa float
 
 # link
   + color
@@ -168,7 +169,7 @@
 
   + :hover   -> hover vào
 
-  + :active  -> hine65 tại đang click
+  + :active  -> hien65 tại đang click
 
   + RULE
 	  + :link -> :visited -> :hover -> :active
@@ -317,14 +318,12 @@
 
 
 
-# combinators
+# combinator
   + (space)   -> chọn hậu duệ
-	+ div p
-	+ chọn all p là con/cháu/chắt của div
+	+ div p -> chọn all p là con/cháu/chắt của div
 
   + (>)       -> con trực thuộc
-	+ div > p
-	+ chọn all p là con TRỰC TIẾP từ div
+	+ div > p -> chọn all p là con TRỰC TIẾP từ div
 
   + (+)       -> chọn 1 anh/em ngay sau "KẾ BÊN NHÀ- SÁT NHÀ"
 	+ div + p
@@ -415,7 +414,7 @@
 	  + hover, active
 	  + text center cho 'a' or 'li'
 	  + border / height
-	  + cố dịnh vị trí -> fixed
+	  + cố định vị trí -> fixed
 	  + overflow khi có nhiều content trên bar
 
   + horizontal navigation
@@ -484,7 +483,7 @@
     + currentcolor
     + inherit
 
-# grandients
+# gradients
     + linear
         + linear-gradient(direction, color-stop1, color-stop2,...)
             + direction:
@@ -622,4 +621,183 @@
 	+ external
 	+ internal
 	+ inline
+
+
+
+=====================================================================
+1.1 External Stylesheet
+- attribute "rel" has to be set "stylesheet"
+- attribute href:
+      + relative
+      + absolute
+1.2 Internal Styles
+- <style></style>
+- must be inside the <head>
+1.3 CSS @import rule
+- internal style tag
+  <style>
+    @import url('/css/style.css')
+    </style>
+- external stylesheet
+  @import 'http://fonts.googleapis.com/css?family=Lato';
+
+1.4 Inline styles
+- apply styling to a specific element, not optimal
+- override any css
+1.5 change css with js
+- pure js
+  ```js
+    var el = document.getElementById("element");
+    el.style.opacity = 0.5;
+    el.style.fontFamily = 'sans-serif';
+  ```
+- jQuery
+  ```js
+    $('element').css('margin', '5px');
+  ```
+  or
+  ```js
+    $('#element').css({
+      margin: "5px",
+      padding: "10px",
+      color: "black"
+    })
+  ```
+  1.6 styling list with css
+  - 3 way( default value: disc, outside, none, respectively)
+    + list-style-type
+      * disc, circle, square, decimal, lower-roman, upper-roman, none
+      ```css
+        li{
+          list-style-type: circle;
+        }
+      ```
+    + list-style-image
+      * list-item is set with an image (none, URL)
+      ```css
+        li{
+          list-style-image: url(images/abc.png)
+        }
+      ```
+    + list-style-position
+      * defines where to position the list-item marker(inside, outside)
+
+Chapter 2: STRUCTURE AND FORMATTING OF A CSS RULE
+2.1 Property lists
+- some properties can take multiple values
+  ```css
+    span{
+      text-shadow:
+        yellow 0 0 3px,
+        green 4px 4px 10px;
+    }
+  ```
+  2.2 Multiple Selectors
+  ```css
+    p, .blue, #first, div span{ color: blue}
+  ```
+    + the rule applies to:
+      <p>
+      elements of the blue class
+      element with the ID first
+      every <span> inside of o <div>
+  2.3 Rules, Selectors and Declaration blocks
+
+  Chapter 3: COMMENTS
+  /**/
+  /*
+
+  */
+
+  Chapter 4: SELECTORS
+  4.1 basic selectors
+  - *               : all element
+  - div             : tag selectors
+  - .blue           : class selectors
+  - .blue.red       : all element with class blue and red
+  - #headline       : ID selector
+  - :pseudo-class   : all element with pseudo-class
+  - :pseudo-element : all element matches pseudo-element
+  - :lang(en)       :element that matches :lang declaration (<span lang="en">)
+  - div > p         : child selector
+
+4.2 Attribute Selectors
+- [attr]  : with attribute attr
+- [attr='val']  : where attr has value val
+- [attr~='val'] : where val appears in the whitespace-separated list of attr
+- [attr^='val'] : begin with val
+- [attr$='val'] : ends with val
+- [attr*='val'] : val anywhere
+- [attr|='val'] : exactly val or starts with val
+- [attr='val' i]  :has value val, ignoring val letter casing
+
+4.3 Combinator
+- div span  : Descendant selector
+- div > span  : Child selector
+- a ~ span  : General Sibling selector(all span that are siblings after an <a>)
+- a + span  : Adjacent Sibling selector (all <span> that are immediately after an <a>)
+
+4.4 Pseudo-classes
+- syntax
+  selector:pseudo-class{
+    property: value;
+  }
+
+- :active : any element being activated
+- :any  :
+- :target : select the current active #news element(click on a URL containing that anchor name)
+- :checked  : applies to radio, checkbox, option element
+- :default  : 
+- :disabled :
+- :empty :
+- :enabled  :
+- :first  :
+- :first-child  :
+- :first-of-type  :
+- :focus  :
+- :focus-within :
+- :full-screen  :
+- :hover  :
+- :indeterminate  :
+- :in-range :
+- :invalid  :
+- :lang :
+- :last-child :
+- :last-of-type :
+- :left :
+- :link :
+- :not()  :
+- :nth-child  :
+- :nth-of-type :
+- :only-child :
+- :optional :
+- :out-of-range :
+- :placeholder-show :
+- :read-only  :
+- :read-write :
+- :right  :
+- :root :
+- :scope  :
+- :target :
+- :visited  :
+
+4.5 Child Pseudo class
+- :nth-child(an+b)
+
+4.6 class name selector
+4.7
+4.8 the :last-of-type selector
+
+Chapter 6: Centering
+- using Flexbox
+- using css transform
+- using margin: 0 auto
+
+  
+
+
+
+
+
+
 

@@ -78,6 +78,7 @@
 
 ## các loại data type
 
+###
         primitive
             number / string / boolean
         trivial

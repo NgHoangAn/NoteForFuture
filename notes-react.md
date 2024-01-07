@@ -3,7 +3,7 @@
     -variable
         var:
             scope là global(trừ khi khai bao trong fn thì là fn scope)
-            có tinh hoisting: biến sẻ được đưa lên đầu scope trươc khi thực hiện( giá trị là undefined)
+            có tinh hoisting: biến sẻ được đưa lên đầu scope trước khi thực hiện( giá trị là undefined)
         let:
             scope là block
             cho phep cập nhật giá trị của biến, ko cho tái khai báo lại biến
