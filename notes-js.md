@@ -1846,3 +1846,5 @@ cho phép JavaScript “nói chuyện với” trình duyệt. Nó bao gồm cá
 =====================================
 
 https://www.w3resource.com/javascript-exercises/javascript-basic-exercise-148.php
+
+
