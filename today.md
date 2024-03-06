@@ -1,31 +1,42 @@
 python
-variable
-    - variable_name = value
-    - biến luôn được đi kèm với g/trị
+39. Unpacking Tuple
+```py
 
-string
-    - '' | "" | """...""" (multiline)
-    - escape the quotes: \' or \"
-    - using value of var in a string: f' Hi {name}'
-    - auto concat string: 'hi' 'huy' // hi huy
-    - concat two string : use +
-    - [0] nếu xuôi | [-1] nếu ngược
-    - lenght string : len(str)
-    - slicing: string[start:end]
-    - string là bất biến [ko thể update 1 char trong string] -> tạo string mới xong sửa trên đó
+```
 
-number
-    - 
+DSA
 
+25. Array
 
+        - lưu trữ 1 số phần tử có cùng type data
+        - array = [element[index], ...]
+        - time: O(1)
+        - memory: local
+        - ko thể thay đổi kích thước mảng khi đang chạy
 
+        - dynamic array:
+        - NHẬP VÀO N(NGUYÊN DƯƠNG) VÀ N P/TỬ TRONG DÃY A => TỔNG CỦA DÃY
 
+```py
+n = (int)(input())
+a = []
+for i in range(n):
+        a.append((int)(input()))
+Sum = 0
+for i in range(n):
+        Sum+ = a[i]
+print(Sum)
+```
 
+        - NHẬP VÀO N(NGUYÊN DƯƠNG), N P/TỬ TRONG DÃY A. THAY ĐỔI G/TRỊ CỦA P/TỬ THÀNH BÌNH PHƯƠNG CỦA NÓ.
 
-
-
-
-
-
-
-
+```PY
+n = int(input())
+a = []
+for i in range(n):
+        a.append(int(input()))
+for i in range(n):
+        a[i] *= a[i]
+for i in range(n):
+        print(a[i], end = ' ')
+```
