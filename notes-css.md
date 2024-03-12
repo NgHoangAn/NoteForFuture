@@ -14,10 +14,10 @@
   + -image: url("")
 
   + -repeat
-	+ no-reapeat
+	+ no-repeat
 	+ repeat
 	+ repeat-x
-	+ repate-y
+	+ repeat-y
 
   + -position: position1 position2
 	+ ko lặp và hiển thị ở vị trí nào đó

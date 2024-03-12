@@ -1027,7 +1027,7 @@
     + key - value
     + set() có thể dùng để thay đổi g/trị dã tồn tại trong Map
 
-# typeof
+# typeOf
 
     + 5 loại dữ liệu chứa g/trị
         + string/number/boolean/object/fn
