@@ -3,17 +3,82 @@ OOP
 2. special method
 3. property
 4. single inheritance
-4.4 __slots__
-```py
-
-```
-4.5
-```py
-
-```
-5. enumeration
-6. solid principles
+5. enumerations
+6. SOLID Principles(nguyên tắc)
 7. multiple inheritance
+7.1 Multiple Inheritance
+```py
+# Python allows a class to inherit from multiple classes
+class ChildClass(ParentClass1, ParentClass2, ParentClass3):
+   pass
+
+# When the parent classes have methods with the same name and the child class calls the method, Python uses the method resolution order (MRO) to search for the right method to call
+
+class Car:
+    def start(self):
+        print('Start the Car')
+
+    def go(self):
+        print('Going')
+
+
+class Flyable:
+    def start(self):
+        print('Start the Flyable object')
+
+    def fly(self):
+        print('Flying')
+
+
+class FlyingCar(Flyable, Car):
+    def start(self):
+        super().start()
+
+if __name__ == '__main__':
+    car = FlyingCar()
+    car.start()
+## output: Start the Flyable object 
+## the super().start() calls the start() method of the Flyable class. 
+# WHY? => 
+print(FlyingCar.__mro__)
+# ==> (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
+## uses the __mro__ class search path. => Flyable class is next to the FlyingCar class ==> call it
+
+# Multiple inheritance & super
+class Car:
+    def __init__(self, door, wheel):
+        self.door = door
+        self.wheel = wheel
+
+    def start(self):
+        print('Start the Car')
+
+    def go(self):
+        print('Going')
+
+class Flyable:
+    def __init__(self, wing):
+        self.wing = wing
+
+    def start(self):
+        print('Start the Flyable object')
+
+    def fly(self):
+        print('Flying')
+
+class FlyingCar(Flyable, Car):
+    def __init__(self, door, wheel, wing):
+        super().__init__(wing=wing)     # WHY?
+        self.door = door
+        self.wheel = wheel
+
+    def start(self):
+        super().start()
+
+# (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
+## the super().__init__() calls the __init__ of the FlyingCar class. Therefore, you need to pass the wing argument to the __init__ method.
+## FlyingCar class cannot access the __init__ method of the Car class, you need to initialize the doorand wheel attributes individually
+```
 8. descriptors
 9. meta programming
 10. exceptions

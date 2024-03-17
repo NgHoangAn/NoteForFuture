@@ -940,3 +940,566 @@ if __name__ == '__main__':
 
 # ==>  Using the `super()` function to call a method of a parent class from a child class
 ```
+4.4 __slots__
+```py
+
+```
+4.5 abstract classes
+```py
+# abstract class là class không thể instantiated(khởi tạo)
+# có thể tạo class inherit từ class abstract
+# create blueprint for other class
+# abstract method: method without an implementation
+# python ko hỗ trợ trực tiếp abstract
+from abc import ABC
+
+class AbstractClassName(ABC):
+    pass
+
+# define abstract method
+from abc import ABC, abstractmethod
+
+class AbstractClassName(ABC):
+    @abstractmethod
+    def abstract_method_name(self):
+        pass
+
+# Ex1:
+from abc import ABC, abstractmethod
+
+class Employee(ABC):
+    def __init__(self, first_name, last_name):
+        self.first_name = first_name
+        self.last_name = last_name
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    @abstractmethod
+    def get_salary(self):
+        pass
+
+## fulltime employee
+class FulltimeEmployee(Employee):
+    def __init__(self, first_name, last_name, salary):
+        super().__init__(first_name, last_name)
+        self.salary = salary
+
+    def get_salary(self):
+        return self.salary
+
+## part-time employee
+class HourlyEmployee(Employee):
+    def __init__(self, first_name, last_name, worked_hours, rate):
+        super().__init__(first_name, last_name)
+        self.worked_hours = worked_hours
+        self.rate = rate
+
+    def get_salary(self):
+        return self.worked_hours * self.rate
+
+## Payroll class
+class Payroll:
+    def __init__(self):
+        self.employee_list = []
+
+    def add(self, employee):
+        self.employee_list.append(employee)
+
+    def print(self):
+        for e in self.employee_list:
+            print(f"{e.full_name} \t ${e.get_salary()}")
+
+## main
+from fulltimeemployee import FulltimeEmployee
+from hourlyemployee import HourlyEmployee
+from payroll import Payroll
+
+payroll = Payroll()
+
+payroll.add(FulltimeEmployee('John', 'Doe', 6000))
+payroll.add(FulltimeEmployee('Jane', 'Doe', 6500))
+payroll.add(HourlyEmployee('Jenifer', 'Smith', 200, 50))
+payroll.add(HourlyEmployee('David', 'Wilson', 150, 100))
+payroll.add(HourlyEmployee('Kevin', 'Miller', 100, 150))
+
+payroll.print()
+## output:
+John Doe         $6000
+Jane Doe         $6500
+Jenifer Smith    $10000
+David Wilson     $15000
+Kevin Miller     $15000
+
+# dùng abstract class ki cần chia sẻ code giữa các class có quan hệ gần nhau [child class của employee đều có full_name property]
+
+```
+4.6 Protocol
+```py
+# define implicit interfaces
+from typing import List, Protocol
+
+class Item(Protocol):
+    quantity: float
+    price: float
+
+class Product:
+    def __init__(self, name: str, quantity: float, price: float):
+        self.name = name
+        self.quantity = quantity
+        self.price = price
+
+def calculate_total(items: List[Item]) -> float:
+    return sum([item.quantity * item.price for item in items])
+
+# calculate total a product list
+total = calculate_total([
+    Product('A', 10, 150),
+    Product('B', 5, 250)
+])
+print(total)
+
+
+class Stock:
+    def __init__(self, product_name, quantity, price):
+        self.product_name = product_name
+        self.quantity = quantity
+        self.price = price
+
+# calculate total an inventory list
+total = calculate_total([
+    Stock('Tablet', 5, 950),
+    Stock('Laptop', 10, 850)
+])
+print(total)
+
+## the Product' and 'Stock' class don’t need to subclass the Item class but still can be used in the calculate_total() function.
+```
+5. enumeration
+5.1
+```py
+# là tập hợp các unique constant value
+from enum import Enum
+
+class Color(Enum):
+    RED = 1
+    GREEN = 2
+    BLUE = 3
+
+print(type(Color.RED))  #  <enum 'Color'>
+
+print(Color.RED.name)      # RED
+print(Color.RED.value)     # 1
+
+# enumeration member are always hashable [can use enumeration member as keys in dictionary or element of a Set]
+rgb = {
+    Color.RED: '#ff0000',
+    Color.GREEN: '#00ff00',
+    Color.BLUE: '#0000ff'
+}
+Color.RED
+print(Color['RED']) #  Color.RED
+print(Color(1))     #  Color.RED
+print(Color['RED'] == Color(1)) #  True
+
+# An enumeration is a set of members that have associated unique constant values
+# Use the enumeration[member_name] to access a member by its name and enumeration(member_value) to access a member by its value
+# Enumerable are immuable
+```
+5.2 aliases & enum.unique
+```py
+# can create different member names with the same values
+from enum import Enum
+class Color(Enum):
+    RED = 1
+    CRIMSON = 1
+    SALMON = 1
+    GREEN = 2
+    BLUE = 3
+
+print(Color.RED is Color.CRIMSON)   #  True
+print(Color.RED is Color.SALMON)    #   True
+## CRIMSON and SALMON members are the aliases of the RED member
+ 
+# always get the main member, not aliases
+print(Color(1)) # Color.RED
+
+from enum import Enum
+from pprint import pprint
+class Color(Enum):
+    RED = 1
+    CRIMSON = 1
+    SALMON = 1
+    GREEN = 2
+    BLUE = 3
+pprint(Color.__members__)
+# output:
+# mappingproxy({'BLUE': <Color.BLUE: 3>,
+              'CRIMSON': <Color.RED: 1>,
+              'GREEN': <Color.GREEN: 2>,
+              'RED': <Color.RED: 1>,
+              'SALMON': <Color.RED: 1>})
+
+# 
+import enum
+from enum import Enum
+
+@enum.unique
+class Day(Enum):
+    MON = 'Monday'
+    TUE = 'Monday'
+    WED = 'Wednesday'
+    THU = 'Thursday'
+    FRI = 'Friday'
+    SAT = 'Saturday'
+    SUN = 'Sunday'
+
+# ValueError: duplicate values found in <enum 'Day'>: TUE -> MON
+```
+5.3 customize, extend enum class
+```py
+from enum import Enum
+
+class PaymentStatus(Enum):
+    PENDING = 1
+    COMPLETED = 2
+    REFUNDED = 3
+
+print(PaymentStatus.PENDING)    # PaymentStatus.PENDING
+
+    def __str__(self):
+        return f'{self.name.lower()}({self.value})'
+
+print(PaymentStatus.PENDING)    # pending(1)
+
+# implementing __eq__ method
+
+    def __eq__(self, other):
+        if isinstance(other, int):
+            return self.value == other
+
+        if isinstance(other, PaymentStatus):
+            return self is other
+
+        return False
+
+if PaymentStatus.PENDING == 1:
+    print('The payment is pending.')    # The payment is pending.
+
+# implementing __lt__ method
+from functools import total_ordering
+    def __lt__(self, other):
+        if isinstance(other, int):
+            return self.value < other
+
+        if isinstance(other, PaymentStatus):
+            return self.value < other.value
+
+        return False
+
+## compare with an integer
+status = 1
+if status < PaymentStatus.COMPLETED:
+    print('The payment has not completed')
+
+## compare with another member
+status = PaymentStatus.PENDING
+if status >= PaymentStatus.COMPLETED:
+    print('The payment is not pending')
+
+# implementing __bool__ method
+    def __bool__(self):
+        if self is self.COMPLETED:
+            return True
+
+        return False
+for member in PaymentStatus:
+    print(member, bool(member))     # pending(1) False
+                                    # completed(2) True
+                                    # refunded(3) False
+
+# extend enum class
+from enum import Enum
+from functools import total_ordering
+
+
+@total_ordering
+class OrderedEnum(Enum):
+    def __lt__(self, other):
+        if isinstance(other, OrderedEnum):
+            return self.value < other.value
+        return NotImplemented
+
+
+class ApprovalStatus(OrderedEnum):
+    PENDING = 1
+    IN_PROGRESS = 2
+    APPROVED = 3
+
+
+status = ApprovalStatus(2)
+if status < ApprovalStatus.APPROVED:
+    print('The request has not been approved.')
+
+```
+5.4 enum auto
+```py
+from enum import Enum, auto
+
+class State(Enum):
+    PENDING = auto()
+    FULFILLED = auto()
+    REJECTED = auto()
+
+    def __str__(self):
+        return f'{self.name(self.value)}'
+
+for state in State:
+    print(state.name, state.value)
+## output:
+PENDING 1
+FULFILLED 2
+REJECTED 3
+
+# By default, the auto() class generates a sequence of integer numbers starting from 1
+
+# how work
+# auto() call _generate_next_value()
+_generate_next_value_(name, start, count, last_values)
+
+## EX1:
+from enum import Enum, auto
+
+
+class State(Enum):
+    def _generate_next_value_(name, start, count, last_values):
+        return name.lower()
+
+    PENDING = auto()
+    FULFILLED = auto()
+    REJECTED = auto()
+
+
+for state in State:
+    print(state.name, state.value)
+
+## output:
+PENDING pending
+FULFILLED fulfilled
+REJECTED rejected  
+```
+6. solid principles
+6.1 Single responsibility Principle
+```py
+# The single responsibility principle (SRP) states that every class, method, and function should have only one job or one reason to change
+# purposes (mục đích):
+## high cohesive(gắn kết) and robust(mạnh): class, method, fn
+## promote(thúc đẩy) class composition(thành phần)
+## avoid code duplication
+
+# EX1:
+class PersonDB:
+    def save(self, person):
+        print(f'Save the {person} to the database')
+
+class Person:
+    def __init__(self, name):
+        self.name = name
+    def __repr__(self):
+        return f'Person(name={self.name})'
+
+if __name__ == '__main__':
+    p = Person('John Doe')
+    db = PersonDB()
+    db.save(p)
+
+```
+6.2 Open–closed principle
+```py
+# a class, method, and function should be open for extension but closed for modification
+
+from abc import ABC, abstractmethod
+
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f'Person(name={self.name})'
+
+
+class PersonStorage(ABC):
+    @abstractmethod
+    def save(self, person):
+        pass
+
+# open for extension
+class PersonDB(PersonStorage):
+    def save(self, person):
+        print(f'Save the {person} to database')
+
+class PersonJSON(PersonStorage):
+    def save(self, person):
+        print(f'Save the {person} to a JSON file')
+
+class PersonXML(PersonStorage):
+    def save(self, person):
+        print(f'Save the {person} to an XML file')
+
+
+if __name__ == '__main__':
+    person = Person('John Doe')
+    storage = PersonXML()
+    storage.save(person)
+
+```
+6.3 Liskov Substitution Principle
+```py
+# The Liskov substitution principle states that a child class must be substitutable for its parent class. Liskov substitution principle aims to ensure that the child class can assume the place of its parent class without causing any errors
+
+class Contact:
+    def __init__(self, name, email, phone):
+        self.name = name
+        self.email = email
+        self.phone = phone
+
+class NotificationManager:
+    def __init__(self, notification, contact):
+        self.contact = contact
+        self.notification = notification
+
+    def send(self, message):
+        if isinstance(self.notification, Email):
+            self.notification.notify(message, contact.email)
+        elif isinstance(self.notification, SMS):
+            self.notification.notify(message, contact.phone)
+        else:
+            raise Exception('The notification is not supported')
+
+if __name__ == '__main__':
+    contact = Contact('John Doe', 'john@test.com', '(408)-888-9999')
+    notification_manager = NotificationManager(SMS(), contact)
+    notification_manager.send('Hello John')
+
+## fix it: conform with the Liskov
+from abc import ABC, abstractmethod
+
+class Notification(ABC):
+    @abstractmethod
+    def notify(self, message):
+        pass
+
+class Email(Notification):
+    def __init__(self, email):
+        self.email = email
+    def notify(self, message):
+        print(f'Send "{message}" to {self.email}')
+
+class SMS(Notification):
+    def __init__(self, phone):
+        self.phone = phone
+    def notify(self, message):
+        print(f'Send "{message}" to {self.phone}')
+
+class Contact:
+    def __init__(self, name, email, phone):
+        self.name = name
+        self.email = email
+        self.phone = phone
+
+class NotificationManager:
+    def __init__(self, notification):
+        self.notification = notification
+
+    def send(self, message):
+        self.notification.notify(message)
+
+
+if __name__ == '__main__':
+    contact = Contact('John Doe', 'john@test.com', '(408)-888-9999')
+
+    sms_notification = SMS(contact.phone)
+    email_notification = Email(contact.email)
+
+    notification_manager = NotificationManager(sms_notification)
+    notification_manager.send('Hello John')
+
+    notification_manager.notification = email_notification
+    notification_manager.send('Hi John')
+
+```
+6.4 Interface Segregation Principle
+```py
+# Python uses abstract classes as interfaces because it follows the so-called duck typing principle
+# it should do ONE thing
+
+# EX1:
+class Movable(ABC):
+    @abstractmethod
+    def go(self):
+        pass
+
+
+class Flyable(Movable):
+    @abstractmethod
+    def fly(self):
+        pass
+
+class Aircraft(Flyable):
+    def go(self):
+        print("Taxiing")
+
+    def fly(self):
+        print("Flying")
+
+class Car(Movable):
+    def go(self):
+        print("Going")
+
+# The interface segregation principle advises(khuyên) that the interfaces should be small in terms of cohesions(gắn kết).
+# Make fine grained(chi tiết) interfaces that are client-specific. Clients should not be forced to implement interfaces they do not use.
+```
+6.5 Dependency Inversion Principle
+```py
+# High-level modules should not depend on low-level modules. Both should depend on abstractions
+# Abstractions should not depend on details. Details should depend on abstractions.
+
+# EX:
+from abc import ABC
+
+
+class CurrencyConverter(ABC):
+    def convert(self, from_currency, to_currency, amount) -> float:
+        pass
+
+
+class FXConverter(CurrencyConverter):
+    def convert(self, from_currency, to_currency, amount) -> float:
+        print('Converting currency using FX API')
+        print(f'{amount} {from_currency} = {amount * 1.2} {to_currency}')
+        return amount * 1.15
+
+
+class AlphaConverter(CurrencyConverter):
+    def convert(self, from_currency, to_currency, amount) -> float:
+        print('Converting currency using Alpha API')
+        print(f'{amount} {from_currency} = {amount * 1.2} {to_currency}')
+        return amount * 1.2
+
+
+class App:
+    def __init__(self, converter: CurrencyConverter):
+        self.converter = converter
+
+    def start(self):
+        self.converter.convert('EUR', 'USD', 100)
+
+
+if __name__ == '__main__':
+    converter = AlphaConverter()
+    app = App(converter)
+    app.start()
+
+![alt text](image.png)
+```
