@@ -1503,3 +1503,200 @@ if __name__ == '__main__':
 
 ![alt text](image.png)
 ```
+7. multiple inheritance
+7.1 Multiple Inheritance
+```py
+# Python allows a class to inherit from multiple classes
+class ChildClass(ParentClass1, ParentClass2, ParentClass3):
+   pass
+
+# When the parent classes have methods with the same name and the child class calls the method, Python uses the method resolution order (MRO) to search for the right method to call
+
+class Car:
+    def start(self):
+        print('Start the Car')
+
+    def go(self):
+        print('Going')
+
+
+class Flyable:
+    def start(self):
+        print('Start the Flyable object')
+
+    def fly(self):
+        print('Flying')
+
+
+class FlyingCar(Flyable, Car):
+    def start(self):
+        super().start()
+
+if __name__ == '__main__':
+    car = FlyingCar()
+    car.start()
+## output: Start the Flyable object 
+## the super().start() calls the start() method of the Flyable class. 
+# WHY? => 
+print(FlyingCar.__mro__)
+# ==> (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
+## uses the __mro__ class search path. => Flyable class is next to the FlyingCar class ==> call it
+
+# Multiple inheritance & super
+class Car:
+    def __init__(self, door, wheel):
+        self.door = door
+        self.wheel = wheel
+
+    def start(self):
+        print('Start the Car')
+
+    def go(self):
+        print('Going')
+
+class Flyable:
+    def __init__(self, wing):
+        self.wing = wing
+
+    def start(self):
+        print('Start the Flyable object')
+
+    def fly(self):
+        print('Flying')
+
+class FlyingCar(Flyable, Car):
+    def __init__(self, door, wheel, wing):
+        super().__init__(wing=wing)     # WHY?
+        self.door = door
+        self.wheel = wheel
+
+    def start(self):
+        super().start()
+
+# (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
+## the super().__init__() calls the __init__ of the FlyingCar class. Therefore, you need to pass the wing argument to the __init__ method.
+## FlyingCar class cannot access the __init__ method of the Car class, you need to initialize the doorand wheel attributes individually
+```
+7.2 Mixin
+```py
+# MIxin là 1 class cung cấp các implementation method cho việc tái sử dụng trong child class.
+# mixin ko define a new type
+# child class uses multiple inheritance to combine the mixin class with parent class
+
+# EX1:
+from pprint import pprint
+
+
+class DictMixin:
+    def to_dict(self):
+        return self._traverse_dict(self.__dict__)
+
+    def _traverse_dict(self, attributes):
+        result = {}
+        for key, value in attributes.items():
+            result[key] = self._traverse(key, value)
+
+        return result
+
+    def _traverse(self, key, value):
+        if isinstance(value, DictMixin):
+            return value.to_dict()
+        elif isinstance(value, dict):
+            return self._traverse_dict(value)
+        elif isinstance(value, list):
+            return [self._traverse(key, v) for v in value]
+        elif hasattr(value, '__dict__'):
+            return self._traverse_dict(value.__dict__)
+        else:
+            return value
+
+
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+
+class Employee(DictMixin, Person):
+    def __init__(self, name, skills, dependents):
+        super().__init__(name)
+        self.skills = skills
+        self.dependents = dependents
+
+
+if __name__ == '__main__':
+    e = Employee(
+        name='John',
+        skills=['Python Programming', 'Project Management'],
+        dependents={'wife': 'Jane', 'children': ['Alice', 'Bob']}
+    )
+
+    pprint(e.to_dict())
+## output:
+{'dependents': {'children': ['Alice', 'Bob'], 'wife': 'Jane'},
+'name': 'John',
+'skills': ['Python Programming', 'Project Management']}
+
+# COMPOSE MULTIPLE MIXIN CLASS
+## EX2:
+import json
+from pprint import pprint
+
+
+class DictMixin:
+    def to_dict(self):
+        return self._traverse_dict(self.__dict__)
+
+    def _traverse_dict(self, attributes):
+        result = {}
+        for key, value in attributes.items():
+            result[key] = self._traverse(key, value)
+
+        return result
+
+    def _traverse(self, key, value):
+        if isinstance(value, DictMixin):
+            return value.to_dict()
+        elif isinstance(value, dict):
+            return self._traverse_dict(value)
+        elif isinstance(value, list):
+            return [self._traverse(key, v) for v in value]
+        elif hasattr(value, '__dict__'):
+            return self._traverse_dict(value.__dict__)
+        else:
+            return value
+
+
+class JSONMixin:
+    def to_json(self):
+        return json.dumps(self.to_dict())
+
+
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+
+class Employee(DictMixin, JSONMixin, Person):
+    def __init__(self, name, skills, dependents):
+        super().__init__(name)
+        self.skills = skills
+        self.dependents = dependents
+
+
+if __name__ == '__main__':
+    e = Employee(
+        name='John',
+        skills=['Python Programming''Project Management'],
+        dependents={'wife': 'Jane', 'children': ['Alice', 'Bob']}
+    )
+
+    pprint(e.to_dict())
+    print(e.to_json())
+### OUTPUT:
+{'dependents': {'children': ['Alice', 'Bob'], 'wife': 'Jane'},
+'name': 'John',
+'skills': ['Python ProgrammingProject Management']}
+
+{"name": "John", "skills": ["Python ProgrammingProject Management"], "dependents": {"wife": "Jane", "children": ["Alice", "Bob"]}}
+
+```

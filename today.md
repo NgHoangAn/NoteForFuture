@@ -6,82 +6,200 @@ OOP
 5. enumerations
 6. SOLID Principles(nguyên tắc)
 7. multiple inheritance
-7.1 Multiple Inheritance
-```py
-# Python allows a class to inherit from multiple classes
-class ChildClass(ParentClass1, ParentClass2, ParentClass3):
-   pass
-
-# When the parent classes have methods with the same name and the child class calls the method, Python uses the method resolution order (MRO) to search for the right method to call
-
-class Car:
-    def start(self):
-        print('Start the Car')
-
-    def go(self):
-        print('Going')
-
-
-class Flyable:
-    def start(self):
-        print('Start the Flyable object')
-
-    def fly(self):
-        print('Flying')
-
-
-class FlyingCar(Flyable, Car):
-    def start(self):
-        super().start()
-
-if __name__ == '__main__':
-    car = FlyingCar()
-    car.start()
-## output: Start the Flyable object 
-## the super().start() calls the start() method of the Flyable class. 
-# WHY? => 
-print(FlyingCar.__mro__)
-# ==> (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
-## uses the __mro__ class search path. => Flyable class is next to the FlyingCar class ==> call it
-
-# Multiple inheritance & super
-class Car:
-    def __init__(self, door, wheel):
-        self.door = door
-        self.wheel = wheel
-
-    def start(self):
-        print('Start the Car')
-
-    def go(self):
-        print('Going')
-
-class Flyable:
-    def __init__(self, wing):
-        self.wing = wing
-
-    def start(self):
-        print('Start the Flyable object')
-
-    def fly(self):
-        print('Flying')
-
-class FlyingCar(Flyable, Car):
-    def __init__(self, door, wheel, wing):
-        super().__init__(wing=wing)     # WHY?
-        self.door = door
-        self.wheel = wheel
-
-    def start(self):
-        super().start()
-
-# (<class '__main__.FlyingCar'>, <class '__main__.Flyable'>, <class '__main__.Car'>, <class 'object'>)
-## the super().__init__() calls the __init__ of the FlyingCar class. Therefore, you need to pass the wing argument to the __init__ method.
-## FlyingCar class cannot access the __init__ method of the Car class, you need to initialize the doorand wheel attributes individually
-```
 8. descriptors
+8.1 Descriptors
+```py
+## first_name and last_name attributes to be non-empty strings
+# define a descriptor class
+class RequiredString:
+    def __set_name__(self, owner, name):
+        self.property_name = name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        return instance.__dict__[self.property_name] or None
+
+    def __set__(self, instance, value):
+        if not isinstance(value, str):
+            raise ValueError(f'The {self.property_name} must be a string')
+
+        if len(value) == 0:
+            raise ValueError(f'The {self.property_name} cannot be empty')
+
+        instance.__dict__[self.property_name] = value
+
+class Person:
+    first_name = RequiredString()
+    last_name = RequiredString()
+
+try:
+    person = Person()
+    person.first_name = ''
+except ValueError as e:
+    print(e)    #  The first_name must be a string
+
+# DESCRIPTOR PROTOCOL
+## method: __get__, __set__, __delete__
+## is an object of class that implements(thực hiện) one of the method(1 trong các method) specified in the descriptor protocol
+## type: data descriptor & non-data descriptor
+### data descriptor: implements __set__ and/or __delete__
+### non-data descriptor: implement __get__ only
+## HOW WORK?
+class RequiredString:
+    def __set_name__(self, owner, name):
+        print(f'__set_name__ was called with owner={owner} and name={name}')
+        self.property_name = name
+
+    def __get__(self, instance, owner):
+        print(f'__get__ was called with instance={instance} and owner={owner}')
+        if instance is None:
+            return self
+
+        return instance.__dict__[self.property_name] or None
+
+    def __set__(self, instance, value):
+        print(f'__set__ was called with instance={instance} and value={value}')
+
+        if not isinstance(value, str):
+            raise ValueError(f'The {self.property_name} must a string')
+
+        if len(value) == 0:
+            raise ValueError(f'The {self.property_name} cannot be empty')
+
+        instance.__dict__[self.property_name] = value
+
+
+class Person:
+    first_name = RequiredString()
+    last_name = RequiredString()
+### OUTPUT:
+__set_name__ was called with owner=<class '__main__.Person'> and name=first_name
+__set_name__ was called with owner=<class '__main__.Person'> and name=last_name
+
+### Python automatically calls the __set_name__ when the owning class Person is created
+
+first_name = RequiredString()
+### EQUIVALENT
+first_name.__set_name__(Person, 'first_name')
+
+from pprint import pprint
+
+pprint(Person.__dict__)
+### OUTPUT
+mappingproxy({'__dict__': <attribute '__dict__' of 'Person' objects>,
+            '__doc__': None,
+            '__module__': '__main__',
+            '__weakref__': <attribute '__weakref__' of 'Person' objects>,
+            'first_name': <__main__.RequiredString object at 0x0000019D6AB947F0>,
+            'last_name': <__main__.RequiredString object at 0x0000019D6ACFBE80>})
+
+# assign the new value to a descriptor, Python calls __set__ method to set the attribute on an instance of the owner class to the new value
+person = Person()
+person.first_name = 'John'
+### OUTPUT: __set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
+
+# Python uses instance.__dict__ dictionary to store instance attributes of the instance object.
+person = Person()
+print(person.__dict__)  # {}
+
+person.first_name = 'John'
+person.last_name = 'Doe'
+
+print(person.__dict__) # {'first_name': 'John', 'last_name': 'Doe'}
+
+# __GET__
+person = Person()
+
+person.first_name = 'John'
+print(person.first_name)
+### OUTPUT: 
+__set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
+__get__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and owner=<class '__main__.Person'>
+
+# The __get__ method returns the descriptor if the instance is None
+print(Person.first_name) # <__main__.RequiredString object at 0x000001AF1DA147F0>
+
+# If the instance is not None, the __get__() method returns the value of the attribute with the name property_name of the instance object
+
+```
+8.2 DATA VS NON-DATA DESCRIPTOR
+```py
+# Both descriptor types can optionally implement the __set_name__ method. The __set_name__ method doesn’t affect the classification of the descriptors
+
+# If a class uses a non-data descriptor, Python will search the attribute in instance attributes first (instance.__dict__)
+## If Python doesn’t find the attribute in the instance attributes, it’ll use the data descriptor.
+class FileCount:
+    def __get__(self, instance, owner):
+        print('The __get__ was called')
+        return len(os.listdir(instance.path))
+
+class Folder:
+    count = FileCount()
+
+    def __init__(self, path):
+        self.path = path
+
+folder = Folder('/')
+print('file count: ', folder.count)
+# Python called the __get__ descriptor
+## output:
+The __get__ was called
+file count:  32
+
+folder.__dict__['count'] = 100
+print('file count: ', folder.count)
+## output: file count:  100
+## Python can find the count attribute in the instance dictionary __dict__. Therefore, it does not use data descriptors.
+
+# chưa hiểu gì hết
+```
 9. meta programming
 10. exceptions
+
+====CONCURRENCY====
+
+1. Multithreading
+2. Thread Synchronization Techniques
+3. Sharing Data Between Threads
+4. Multiprocessing
+5. Async I/O
+
+====ADVanced====
+1. Variables & Memory Management
+2. Integer types
+3. Float
+4. Decimal
+5. Variable scopes
+6. Closures
+7. Decorators
+8. Named Tuples
+9. Sequence Types
+10. Iterators and Iterables
+11. Generators
+12. Context Managers
+
+====Regex====
+====Unit Test====
+====NumPy====
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 1. Array
 ```py
@@ -145,3 +263,10 @@ for i in range(a+1):
 print(result)
 ```
 
+https://www.javascripttutorial.net/
+
+https://www.mysqltutorial.org/
+
+https://react-tutorial.app/app.html
+
+https://www.tutorialspoint.com/reactjs/reactjs_pagination.htm
