@@ -1,4 +1,4 @@
-1.  variable
+1. variable
 ```py
 # variable_name = value
 # biến luôn được đi kèm với g/trị
@@ -24,7 +24,7 @@ string[start:end]
 
 # string là bất biến [ko thể update 1 char trong string] -> tạo string mới xong sửa trên đó
 ```
-3.  number
+3. number
 ```py
 # integer [-1,0,1,2...] type "int"
 "+, -, *, /"
@@ -34,21 +34,21 @@ string[start:end]
 # floats
 ## division integer always return 'float'
 ```
-4.  Boolean
+4. Boolean
 ```py
 # True/False
 # Bool()
 # Falsy, Truthy
 
 ```
-5.  Constants
+5. Constants
 ```py
 # Python doesn't support constants
 
 # use chữ cái viết hoa đặt tên cho biến. 
 FILE_SIZE = 1000
 ```
-6.  Type Conversion
+## 6. Type Conversion
 ```py
 int(str), 
 float(str), 
@@ -86,7 +86,7 @@ def fn():
     else:
         fn()
 ```
-10. Lambda Expressions
+## 10. Lambda Expressions
 ```py
 # dùng khi viết fn dùng 1 lần
 # define anonymous fn
@@ -96,7 +96,7 @@ lambda param: expression
         lambda fName,lName: f"{fName} {lName}"
 ```
 11. Fn Docstring
-12. list
+## 12. list
 ```py
 empty_list = []
 todo_list = ['learn','work', 'write CV']
@@ -114,7 +114,7 @@ del todo_list[0] =>  ['work', 'write CV'] // remove first
 todo_list.pop() => 'how' //remove last
 todo_list.remove('work') => [learn, write CV]
 ```
-13. tuples
+## 13. tuples
 ```py
 # create list of items cannot be changed
 # tuples is an immutable list
@@ -207,7 +207,7 @@ enumerate(info,1) // default = 0, set = 1
 # use index(element)
 result = infos.index('Tom')
 ```
-20. Iterables 
+## 20. Iterables 
 ```py
 # an iterable is an object that includes zero, one, many elements 
 
@@ -266,7 +266,7 @@ populated = filter(lambda c: c[1] > 300000000, countries)
 print(list(populated))
 
 ```
-23. reduce
+## 23. reduce
 ```py
 reduce(fn, list)
 
@@ -281,7 +281,7 @@ total = reduce(lambda a, b: a + b, scores)
 
 print(total)
 ```
-24. list Comprehensions
+## 24. list Comprehensions
 ```py
 [output_expression for element in list if condition]
 
@@ -306,7 +306,7 @@ mountains = [
 highest_mountains = [m for m in mountains if m[1] > 8600]
 print(highest_mountains)
 ```
-25. DICTIONARY TYPE
+## 25. DICTIONARY TYPE
 ```PY
 # uses '{}' define a dictionary
 empty_dict = {}
@@ -370,7 +370,7 @@ selected_stocks = {s: p for (s, p) in stocks.items() if p > 200}
 
 print(new_stocks)
 ```
-27. Set
+## 27. Set
 ```py
 # A set is an unordered collection of unique elements
 # cannot be changed. They can be numbers, string, tuples, but not lists or dictionaries
@@ -573,7 +573,7 @@ while True:
         break
 
 ```
-39. Unpacking Tuple
+## 39. Unpacking Tuple
 ```py
 # tuple constructor
 tuple()
@@ -602,7 +602,7 @@ even_numbers = (2, 4, 6)
 numbers = (*odd_numbers, *even_numbers)   # numbers = (1, 3, 5, 2, 4,  6)
 
 ```
-40. *args
+## 40. *args
 ```py
 # parameters like *args => variadic(có tính biến đổi) parameter
 def add(*args):
@@ -618,7 +618,7 @@ origin = point(a)   # TypeError: point() missing 1 required positional argument:
 origin = point(*a)  #: output: (0,0), unpacks the tuple and assigns its elements to x and y parameters
 print(origin)
 ```
-41. **kwargs
+## 41. **kwargs
 ```py
 # keyword arguments like **kwargs => dictionary-like(tương tự như một tập của key và value) parameter
 def connect(**kwargs):
@@ -700,12 +700,13 @@ import package.module
 from module import function
 
 ```
-47. private Fn
+## 47. private Fn
 ```py
 # create a package with the __init__.py
 # do not specify the fn in the __all__ variable
 # import all symbols from the module in the __init__.py file of the package and expose only the public fn by using the __all__ variable
-├── mail
+
+├── mail |
 |  ├── email.py
 |  └── __init__.py
 └── main.py
@@ -1171,7 +1172,7 @@ pip uninstall <package_name>
 
 pip show <package_name>
 ```
-61. venv
+## 61. venv
 62. F-string
 ```py
 name = 'John'

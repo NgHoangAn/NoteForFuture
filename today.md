@@ -1,166 +1,7 @@
-OOP
-1. Class and Object
-2. special method
-3. property
-4. single inheritance
-5. enumerations
-6. SOLID Principles(nguyên tắc)
-7. multiple inheritance
-8. descriptors
-8.1 Descriptors
-```py
-## first_name and last_name attributes to be non-empty strings
-# define a descriptor class
-class RequiredString:
-    def __set_name__(self, owner, name):
-        self.property_name = name
-
-    def __get__(self, instance, owner):
-        if instance is None:
-            return self
-
-        return instance.__dict__[self.property_name] or None
-
-    def __set__(self, instance, value):
-        if not isinstance(value, str):
-            raise ValueError(f'The {self.property_name} must be a string')
-
-        if len(value) == 0:
-            raise ValueError(f'The {self.property_name} cannot be empty')
-
-        instance.__dict__[self.property_name] = value
-
-class Person:
-    first_name = RequiredString()
-    last_name = RequiredString()
-
-try:
-    person = Person()
-    person.first_name = ''
-except ValueError as e:
-    print(e)    #  The first_name must be a string
-
-# DESCRIPTOR PROTOCOL
-## method: __get__, __set__, __delete__
-## is an object of class that implements(thực hiện) one of the method(1 trong các method) specified in the descriptor protocol
-## type: data descriptor & non-data descriptor
-### data descriptor: implements __set__ and/or __delete__
-### non-data descriptor: implement __get__ only
-## HOW WORK?
-class RequiredString:
-    def __set_name__(self, owner, name):
-        print(f'__set_name__ was called with owner={owner} and name={name}')
-        self.property_name = name
-
-    def __get__(self, instance, owner):
-        print(f'__get__ was called with instance={instance} and owner={owner}')
-        if instance is None:
-            return self
-
-        return instance.__dict__[self.property_name] or None
-
-    def __set__(self, instance, value):
-        print(f'__set__ was called with instance={instance} and value={value}')
-
-        if not isinstance(value, str):
-            raise ValueError(f'The {self.property_name} must a string')
-
-        if len(value) == 0:
-            raise ValueError(f'The {self.property_name} cannot be empty')
-
-        instance.__dict__[self.property_name] = value
-
-
-class Person:
-    first_name = RequiredString()
-    last_name = RequiredString()
-### OUTPUT:
-__set_name__ was called with owner=<class '__main__.Person'> and name=first_name
-__set_name__ was called with owner=<class '__main__.Person'> and name=last_name
-
-### Python automatically calls the __set_name__ when the owning class Person is created
-
-first_name = RequiredString()
-### EQUIVALENT
-first_name.__set_name__(Person, 'first_name')
-
-from pprint import pprint
-
-pprint(Person.__dict__)
-### OUTPUT
-mappingproxy({'__dict__': <attribute '__dict__' of 'Person' objects>,
-            '__doc__': None,
-            '__module__': '__main__',
-            '__weakref__': <attribute '__weakref__' of 'Person' objects>,
-            'first_name': <__main__.RequiredString object at 0x0000019D6AB947F0>,
-            'last_name': <__main__.RequiredString object at 0x0000019D6ACFBE80>})
-
-# assign the new value to a descriptor, Python calls __set__ method to set the attribute on an instance of the owner class to the new value
-person = Person()
-person.first_name = 'John'
-### OUTPUT: __set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
-
-# Python uses instance.__dict__ dictionary to store instance attributes of the instance object.
-person = Person()
-print(person.__dict__)  # {}
-
-person.first_name = 'John'
-person.last_name = 'Doe'
-
-print(person.__dict__) # {'first_name': 'John', 'last_name': 'Doe'}
-
-# __GET__
-person = Person()
-
-person.first_name = 'John'
-print(person.first_name)
-### OUTPUT: 
-__set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
-__get__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and owner=<class '__main__.Person'>
-
-# The __get__ method returns the descriptor if the instance is None
-print(Person.first_name) # <__main__.RequiredString object at 0x000001AF1DA147F0>
-
-# If the instance is not None, the __get__() method returns the value of the attribute with the name property_name of the instance object
-
-```
-8.2 DATA VS NON-DATA DESCRIPTOR
-```py
-# Both descriptor types can optionally implement the __set_name__ method. The __set_name__ method doesn’t affect the classification of the descriptors
-
-# If a class uses a non-data descriptor, Python will search the attribute in instance attributes first (instance.__dict__)
-## If Python doesn’t find the attribute in the instance attributes, it’ll use the data descriptor.
-class FileCount:
-    def __get__(self, instance, owner):
-        print('The __get__ was called')
-        return len(os.listdir(instance.path))
-
-class Folder:
-    count = FileCount()
-
-    def __init__(self, path):
-        self.path = path
-
-folder = Folder('/')
-print('file count: ', folder.count)
-# Python called the __get__ descriptor
-## output:
-The __get__ was called
-file count:  32
-
-folder.__dict__['count'] = 100
-print('file count: ', folder.count)
-## output: file count:  100
-## Python can find the count attribute in the instance dictionary __dict__. Therefore, it does not use data descriptors.
-
-# chưa hiểu gì hết
-```
-9. meta programming
-10. exceptions
-
 ====CONCURRENCY====
 
 1. Multithreading
+
 2. Thread Synchronization Techniques
 3. Sharing Data Between Threads
 4. Multiprocessing
@@ -168,6 +9,119 @@ print('file count: ', folder.count)
 
 ====ADVanced====
 1. Variables & Memory Management
+1.1 References
+```py
+# a variable references on object that hold a value
+# variable ae references
+
+# find the memory address of an object references by a variable
+counter = 100
+print(id(counter)) # 14717671523072
+print(hex(id(counter))) # 0x7ffb62d32300
+
+# Reference counting
+## An object in the memory address can have one or more references
+counter = 100
+max = counter
+
+# Once an object doesn’t have any reference, Python Memory Manager will destroy that object and reclaim the memory
+import ctypes
+
+def ref_count(address):
+    return ctypes.c_long.from_address(address).value
+
+numbers = [1, 2, 3]
+numbers_id = id(numbers)
+
+print(ref_count(numbers_id))  # 1
+
+ranks = numbers
+print(ref_count(numbers_id))  # 2
+
+ranks = None
+print(ref_count(numbers_id))  # 1
+
+numbers = None
+print(ref_count(numbers_id))  # 0
+```
+1.2 Garbage Collection
+```py
+# khi có 1 object tham chiếu đến chính nó or 2 object tham chiếu lẫn nhau  ==> circular references[python memory manager cannot remove object with circular references] ==> use garbage collector
+
+import gc
+import ctypes
+
+## counting ref
+def ref_count(address):
+    return ctypes.c_long.from_address(address).value
+
+## check if exist
+def object_exists(object_id):
+    for object in gc.get_objects():
+        if id(object) == object_id:
+            return True
+    return False
+
+# 2 class A,B tham chiếu lẫn nhau
+class A:
+    def __init__(self):
+        self.b = B(self)
+        print(f'A: {hex(id(self))}, B: {hex(id(self.b))}')
+
+class B:
+    def __init__(self, a):
+        self.a = a
+        print(f'B: {hex(id(self))}, A: {hex(id(self.a))}')
+
+gc.disable()
+
+a = A()     # B: 0x20fccd148e0, A: 0x20fccd75c40
+            # A: 0x20fccd75c40, B: 0x20fccd148e0
+
+a_id = id(a)
+b_id = id(a.b)
+print(ref_count(a_id))  # 2 [the variable a and the instance of B]
+print(ref_count(b_id))  # 1 [the instance of A]
+
+## check instance
+print(object_exists(a_id))  # True
+print(object_exists(b_id))  # True
+
+a = None
+print(ref_count(a_id))  # 1
+print(ref_count(b_id))  # 1
+
+print(object_exists(a_id))  # True
+print(object_exists(b_id))  # True
+
+## it can detect the circular reference, destroy the objects, and reclaim the memory
+gc.collect()
+
+print(object_exists(a_id))  # False
+print(object_exists(b_id))  # False
+
+print(ref_count(a_id))  # 0
+print(ref_count(b_id))  # 0
+
+# ** Note**
+## garbage collector ovoid(tránh) memory leak bằng cánh phát hiện circular references và hủy chúng
+```
+1.3 Dynamic Typing 
+```py
+# Python is a dynamically typed language
+message = 'Hello'
+# the message variable is just a reference to an object which is a string. There is no type associated with the message variable
+
+message = 100
+# Python creates a new integer object, and the message references to the new integer object
+
+# determine the type of object that a variable currently references
+message = 'Hello'
+print(type(message))    # <class 'str'>
+
+message = 100
+print(type(message))    # <class 'int'>
+```
 2. Integer types
 3. Float
 4. Decimal
@@ -184,6 +138,7 @@ print('file count: ', folder.count)
 ====Unit Test====
 ====NumPy====
 
+====CSS====
 
 
 
@@ -266,7 +221,67 @@ print(result)
 https://www.javascripttutorial.net/
 
 https://www.mysqltutorial.org/
+![sample database diagram](sample-database-diagram.png)
+====BaSic====
+1. Querying data
+```sql
+SELECT select_list, select_list1,...
+FROM table_name;
+
+```
+2. Sorting data
+3. Filtering data
+4. Joining tables
+5. Grouping data
+6. Sub queries
+7. Set operator
+8. Managing database
+9. Working with table
+10. constraints
+11. Data types
+12. MOdifying data
+13. Common table Expression
+14. Locking
+15. Globalization
+16. User-define variable
+17. import & export CSV
+18. Adv techniques
+====Adv====
+1. Stored procedures
+2. Conditional Statements
+3. Loops
+4. Error Handling
+5. Cursors
+6. Stored Function
+7. Stored Program Security
+8. Transaction
+9. Trigger
+10. Event
+11. Views
+12. Index
+    1. Creating and Managing
+    2. Index Types
+    3. INdex Hints
+13. Json
+    1. search json document
+    2. Modifying Json document
+    3. querying Json document
+    4. Json array
+    5. Aggregating Json Data
+    6. index Json data
+    7. Getting attribute Json value
+    8. Json table fn
+    9. validation fn
+    10. utility fn
+14. Full-text search
+====Administration====
+==== Function====
+====API====
+1. python
+2. Nodejs
 
 https://react-tutorial.app/app.html
 
 https://www.tutorialspoint.com/reactjs/reactjs_pagination.htm
+
+https://www.javazerotomastery.com/

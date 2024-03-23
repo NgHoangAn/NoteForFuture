@@ -1,5 +1,5 @@
 1. Class and Object
-   1.1 what
+1.1 what
 
 ```py
 # define a class
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
 ```
 
-1.5 instance variable
+1.6 instance variable
 
 ```py
 from pprint import pprint
@@ -1698,5 +1698,434 @@ if __name__ == '__main__':
 'skills': ['Python ProgrammingProject Management']}
 
 {"name": "John", "skills": ["Python ProgrammingProject Management"], "dependents": {"wife": "Jane", "children": ["Alice", "Bob"]}}
+
+```
+8. descriptors
+8.1 Descriptors
+```py
+## first_name and last_name attributes to be non-empty strings
+# define a descriptor class
+class RequiredString:
+    def __set_name__(self, owner, name):
+        self.property_name = name
+
+    def __get__(self, instance, owner):
+        if instance is None:
+            return self
+
+        return instance.__dict__[self.property_name] or None
+
+    def __set__(self, instance, value):
+        if not isinstance(value, str):
+            raise ValueError(f'The {self.property_name} must be a string')
+
+        if len(value) == 0:
+            raise ValueError(f'The {self.property_name} cannot be empty')
+
+        instance.__dict__[self.property_name] = value
+
+class Person:
+    first_name = RequiredString()
+    last_name = RequiredString()
+
+try:
+    person = Person()
+    person.first_name = ''
+except ValueError as e:
+    print(e)    #  The first_name must be a string
+
+# DESCRIPTOR PROTOCOL
+## method: __get__, __set__, __delete__
+## is an object of class that implements(thực hiện) one of the method(1 trong các method) specified in the descriptor protocol
+## type: data descriptor & non-data descriptor
+### data descriptor: implements __set__ and/or __delete__
+### non-data descriptor: implement __get__ only
+## HOW WORK?
+class RequiredString:
+    def __set_name__(self, owner, name):
+        print(f'__set_name__ was called with owner={owner} and name={name}')
+        self.property_name = name
+
+    def __get__(self, instance, owner):
+        print(f'__get__ was called with instance={instance} and owner={owner}')
+        if instance is None:
+            return self
+
+        return instance.__dict__[self.property_name] or None
+
+    def __set__(self, instance, value):
+        print(f'__set__ was called with instance={instance} and value={value}')
+
+        if not isinstance(value, str):
+            raise ValueError(f'The {self.property_name} must a string')
+
+        if len(value) == 0:
+            raise ValueError(f'The {self.property_name} cannot be empty')
+
+        instance.__dict__[self.property_name] = value
+
+
+class Person:
+    first_name = RequiredString()
+    last_name = RequiredString()
+### OUTPUT:
+__set_name__ was called with owner=<class '__main__.Person'> and name=first_name
+__set_name__ was called with owner=<class '__main__.Person'> and name=last_name
+
+### Python automatically calls the __set_name__ when the owning class Person is created
+
+first_name = RequiredString()
+### EQUIVALENT
+first_name.__set_name__(Person, 'first_name')
+
+from pprint import pprint
+
+pprint(Person.__dict__)
+### OUTPUT
+mappingproxy({'__dict__': <attribute '__dict__' of 'Person' objects>,
+            '__doc__': None,
+            '__module__': '__main__',
+            '__weakref__': <attribute '__weakref__' of 'Person' objects>,
+            'first_name': <__main__.RequiredString object at 0x0000019D6AB947F0>,
+            'last_name': <__main__.RequiredString object at 0x0000019D6ACFBE80>})
+
+# assign the new value to a descriptor, Python calls __set__ method to set the attribute on an instance of the owner class to the new value
+person = Person()
+person.first_name = 'John'
+### OUTPUT: __set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
+
+# Python uses instance.__dict__ dictionary to store instance attributes of the instance object.
+person = Person()
+print(person.__dict__)  # {}
+
+person.first_name = 'John'
+person.last_name = 'Doe'
+
+print(person.__dict__) # {'first_name': 'John', 'last_name': 'Doe'}
+
+# __GET__
+person = Person()
+
+person.first_name = 'John'
+print(person.first_name)
+### OUTPUT: 
+__set__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and value=John
+__get__ was called with instance=<__main__.Person object at 0x000001F85F7167F0> and owner=<class '__main__.Person'>
+
+# The __get__ method returns the descriptor if the instance is None
+print(Person.first_name) # <__main__.RequiredString object at 0x000001AF1DA147F0>
+
+# If the instance is not None, the __get__() method returns the value of the attribute with the name property_name of the instance object
+
+```
+8.2 DATA VS NON-DATA DESCRIPTOR
+```py
+# Both descriptor types can optionally implement the __set_name__ method. The __set_name__ method doesn’t affect the classification of the descriptors
+
+# If a class uses a non-data descriptor, Python will search the attribute in instance attributes first (instance.__dict__)
+## If Python doesn’t find the attribute in the instance attributes, it’ll use the data descriptor.
+class FileCount:
+    def __get__(self, instance, owner):
+        print('The __get__ was called')
+        return len(os.listdir(instance.path))
+
+class Folder:
+    count = FileCount()
+
+    def __init__(self, path):
+        self.path = path
+
+folder = Folder('/')
+print('file count: ', folder.count)
+# Python called the __get__ descriptor
+## output:
+The __get__ was called
+file count:  32
+
+folder.__dict__['count'] = 100
+print('file count: ', folder.count)
+## output: file count:  100
+## Python can find the count attribute in the instance dictionary __dict__. Therefore, it does not use data descriptors.
+
+# chưa hiểu gì hết
+```
+9. meta programming
+9.1 __new__
+```py
+#  create an instance of a class ==> Python first calls the __new__() method to create the object ==> calls the __init__() method to initialize the object’s attributes
+# __new__() is a static method of the object class
+object.__new__(class, *args, **kwargs)
+
+# define a new class, that class implicitly inherits from the object class. It means that you can override the __new__ static method and do something before and after creating a new instance of the class.
+# create the object of a class
+super().__new__()
+
+# EX1:
+class Person:
+    def __init__(self, name):
+        self.name = name
+
+
+person = Person('John')
+# equivalent
+person = object.__new__(Person, 'John')
+person.__init__('John')
+
+person = object.__new__(Person, 'John')
+print(person.__dict__)  #  {}
+
+person.__init__('John')
+print(person.__dict__)  #  {'name': 'John'}
+
+# EX2: Python calls the __new__ and __init__ method when you create a new object by calling the class
+class Person:
+    def __new__(cls, name):
+        print(f'Creating a new {cls.__name__} object...')
+        obj = object.__new__(cls)
+        return obj
+
+    def __init__(self, name):
+        print(f'Initializing the person object...')
+        self.name = name
+
+
+person = Person('John')
+##output:
+Creating a new Person object...
+Initializing the person object...
+
+# use the __new__() method when you want to tweak(điều chỉnh) the object at the instantiated time(thời điểm khởi tạo)
+
+# EX3:
+class Person:
+    def __new__(cls, first_name, last_name):
+        # create a new object
+        obj = super().__new__(cls)
+
+        # initialize attributes
+        obj.first_name = first_name
+        obj.last_name = last_name
+
+        # inject new attribute
+        obj.full_name = f'{first_name} {last_name}'
+        return obj
+
+
+person = Person('John', 'Doe')
+print(person.full_name)
+
+print(person.__dict__)
+## output:
+John Doe
+{'first_name': 'John', 'last_name': 'Doe', 'full_name': 'John Doe'}
+```
+9.2 type Class
+```py
+# a class is an object of the class type
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def greeting(self):
+        return f'Hi, I am {self.name}. I am {self.age} year old.'
+
+print(type(Person)) # <class 'type'>
+print(isinstance(Person, type)) # True
+
+# Python uses the type class to create other classes. The type class itself is a callable
+type(name, bases, dict) -> a new type
+## name: is the name of the class (Person)
+## bases is a tuple that contains the base classes of the new class (the Person inherits from the object class, so the bases contains one class (object,))
+## dict: class namespace
+
+# hoe python create class
+## First, extract the class body as string
+class_body = """
+def __init__(self, name, age):
+    self.name = name
+    self.age = age
+
+def greeting(self):
+    return f'Hi, I am {self.name}. I am {self.age} year old.'
+"""
+
+## Second, create a class dictionary
+class_dict = {}
+
+## Third, execute the class body and fill up the class dictionary
+exec(class_body, globals(), class_dict)
+
+## Finally, create a new Person class using the type constructor
+Person = type('Person', (object,), class_dict)
+### ==> the Person is a class, which is also an object. The Person class inherits from the object class and has the namespace of the class_dict
+
+# type class creates other classes, we often refer to it as a metaclass. A metaclass is a class used to create other classes
+```
+9.3 metaclass
+```py
+# A metaclass is a class that creates other classes
+# uses the type metaclass to create other classes.
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+## look like
+class Person(object, metaclass=type):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+# ==> it uses the type metaclass to create the Person class. The reason is that the Person class uses the type metaclass by default
+
+# EX1:
+class Human(type):
+    def __new__(mcs, name, bases, class_dict):
+        class_ = super().__new__(mcs, name, bases, class_dict)
+        class_.freedom = True
+        return class_
+## __new__ method returns a new class or a class object
+
+class Person(object, metaclass=Human):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+pprint(Person.__dict__)
+## output:
+mappingproxy({'__dict__': <attribute '__dict__' of 'Person' objects>,
+              '__doc__': None,
+              '__init__': <function Person.__init__ at 0x000001E716C71670>,
+              '__module__': '__main__',
+              '__weakref__': <attribute '__weakref__' of 'Person' objects>,
+              'freedom': True})
+
+# metaclass parameter
+class Human(type):
+    def __new__(mcs, name, bases, class_dict, **kwargs):
+        class_ = super().__new__(mcs, name, bases, class_dict)
+        if kwargs:
+            for name, value in kwargs.items():
+                setattr(class_, name, value)
+        return class_
+
+class Person(object, metaclass=Human, country='USA', freedom=True):
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+pprint(Person.__dict__)
+## output:
+mappingproxy({'__dict__': <attribute '__dict__' of 'Person' objects>,
+              '__doc__': None,
+              '__init__': <function Person.__init__ at 0x0000018A334235E0>,
+              '__module__': '__main__',
+              '__weakref__': <attribute '__weakref__' of 'Person' objects>,
+              'country': 'USA',
+              'freedom': True})
+
+# USE WHEN
+
+```
+9.4 data class
+```py
+
+```
+
+10. exceptions
+```py
+# exceptions are objects of the exception classes
+# All exception classes are the subclasses of the BaseException class
+![Base exception](base-exception.png)
+
+colors = ['red', 'green', 'blue']
+print(colors[3])    # IndexError: list index out of range
+
+# The IndexError class inherits from the LookupError class which inherits from the Exception class
+![indexError](index-error.png)
+
+## fix
+colors = ['red', 'green', 'blue']
+
+try:
+    print(colors[3])
+except IndexError as e:
+    print(e)
+
+print('Continue to run')
+## output:
+<class 'IndexError'> - list index out of range
+Continue to run
+
+## OR FIX:
+colors = ['red', 'green', 'blue']
+
+try:
+    print(colors[3])
+except Exception as e:
+    print(e.__class__, '-', e)
+
+print('Continue to run')
+# Output:
+<class 'IndexError'> - list index out of range
+Continue to run
+
+# EX1:
+def division(a, b):
+    try:
+        return {
+            'success': True,
+            'message': 'OK',
+            'result': a / b
+        }
+    except (TypeError, ZeroDivisionError, Exception) as e:
+        return {
+            'success': False,
+            'message': str(e),
+            'result': None
+        }
+
+
+result = division(10, 0)
+print(result)   # {'success': False, 'message': 'division by zero', 'result': None}
+
+```
+10.1 Exception Handling
+```py
+try:
+    # code that you want to protect from exceptions
+except <ExceptionType> as ex:
+    # code that handle the exception
+finally:
+    # code that always execute whether the exception occurred or not
+else:
+    # code that excutes if try execute normally (an except clause must be present)
+
+#EX
+try:
+...
+except <ExceptionType1> as ex:
+    log(ex)
+except <ExceptionType2> as ex:
+    log(ex)
+# ==> become
+try:
+...
+except (<ExceptionType1>, <ExceptionType2>) as ex:
+    log(ex)
+
+# EX:
+# EX except 
+# Bare exception handles
+```
+10.2 Raise exception
+```py
+
+```
+10.3 Raise form
+```py
+
+```
+10.4 Custom exception
+```py
 
 ```
