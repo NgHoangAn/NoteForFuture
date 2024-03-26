@@ -1,5 +1,5 @@
-1. USE STRICT                   DONE
-2. VARIABLE                     DONE
+1. USE STRICT                   
+2. VARIABLE                     
 3. DATA TYPES
     PART-1  DONE
     PART-2  1/2

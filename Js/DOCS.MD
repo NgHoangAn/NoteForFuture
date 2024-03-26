@@ -1,111 +1,110 @@
-1. use strict
-- khi ccó thêm tính năng mới và sửa đổi một số tính năng cũ. để giử cho mã cũ được hoạt động nên các sửa đổi như vậy đều bị tắt theo mặc định. nên  là muốn dùng thì kích hoạt nó bằng cách thêm "use strict"
-- thêm vào đầu script
-- khi sử dụng mà có class và module thì không cần khai báo 'use strict' vì nó đã tự động thêm rồi.
+# 1. use strict
+```js
+// khi có thêm tính năng mới và sửa đổi một số tính năng cũ. để giử cho mã cũ được hoạt động nên các sửa đổi như vậy đều bị tắt theo mặc định => nên  là muốn dùng thì kích hoạt nó bằng cách thêm "use strict"
 
-2. Variable
-- là nơi lưu trữ có tên cho dữ liệu
->- [var] : không bị giới hạn trong pham vi
-hàm, lưu trữ toàn cục (global scope)
+// thêm vào đầu script
+"use strict";
 
->- [let] (từ ES6): bị giới hạn trong phạm vi
-hàm [tránh viết đè lên giá trị biến bên
-ngoài hàm]
+// khi sử dụng mà có class và module thì không cần khai báo 'use strict' vì nó đã tự động thêm rồi.
+```
+# 2. Variable
+```js
+// là nơi lưu trữ có tên cho dữ liệu
+// [var] : không bị giới hạn trong pham vi hàm, lưu trữ toàn cục (global scope)
 
->- [const] (từ ES6): biến không thể gán lại
-giá trị sau khi được khởi tạo [đảm bảo an
-toàn dữ liệu]
+// [let] (từ ES6): bị giới hạn trong phạm vi hàm [tránh viết đè lên giá trị biến bên ngoài hàm]
 
->=> [kết luận]: 
-> - Nên dùng let, const thay cho var [tránh các vấn đề liên quan đến phạm vi biến và vòng đời biến]
+// [const] (từ ES6): biến không thể gán lại giá trị sau khi được khởi tạo [đảm bảo an toàn dữ liệu]
 
->Nâng cao: sử dụng các quy tắc cam kết như
-Immutable Infrastructure để đảm bảo tính
-ổn định và dễ bảo trì
+// => [kết luận]: 
+//// Nên dùng let, const thay cho var [tránh các vấn đề liên quan đến phạm vi biến và vòng đời biến]
 
-***
-3. Data types
-- PART-1
-> có 8 loại data type
- - dynamic type: tồn tại data type nhưng các biến không bị ràng buộc với bất kì kiểu nào
+// Nâng cao: sử dụng các quy tắc cam kết như Immutable Infrastructure để đảm bảo tính ổn định và dễ bảo trì
+```
 
-- NUmber: ngoài các kiều số bình thường ra còn có Infinity,  Infinity và NaN
-    + (1/0) infinity
-    + NaN thì là lỗi tính toán, kq của phép toán không xác định 
+# 3. Data types
+```js
+// ====PART-1====
+//// có 8 loại data type
+    // dynamic type: tồn tại data type nhưng các biến không bị ràng buộc với bất kì kiểu nào
 
-- BigInt: số nguyên có độ dài tùy ý
-- String: 0 or nhiều kí tự, ko có đơn lẻ. ''/""/``
-- Boolean: true, false
-- Null: tham chiếu đến 1 đối tượng không tốn tại[con trỏ rỗng]
-- Undefined: giá trị không được gán
-- object
-- symbol: mã định danh duy nhất
-- typeOf
+    // Number: ngoài các kiều số bình thường ra còn có Infinity,  Infinity và NaN
+        // (1/0) infinity
+        // NaN thì là lỗi tính toán, kq của phép toán không xác định 
 
-- PART-2
-1. Methods of primitives
-2. Number
-    - toString(base)--> string  
-        base: 2 to 36. default 10
-        base = 16: hex color,character encodings, digit 0..9 or A..F.
-        base = 2: bitwise operations (0 or 1)
-        base = 36: 0..9 and a..z
+    //BigInt: số nguyên có độ dài tùy ý
+    // String: 0 or nhiều kí tự, ko có đơn lẻ. ''/""/``
+    // Boolean: true, false
+    //Null: tham chiếu đến 1 đối tượng không tốn tại[con trỏ rỗng]
+    // Undefined: giá trị không được gán
+    // object
+    // symbol: mã định danh duy nhất
+    // typeOf
+
+//====PART-2====
+    // 1. Methods of primitives
+    // 2. Number
+        // toString(base)--> string  
+            // base: 2 to 36. default 10
+            // base = 16: hex color,character encodings, digit 0..9 or A..F.
+            // base = 2: bitwise operations (0 or 1)
+            // base = 36: 0..9 and a..z
     
-    - Rounding
-        .floor: 3.1 -> 3 ||| -1.1 -> -2 (down)
-        .ceil: 3.1 -> 4 ||| -1.1 -> -1  (up)
-        .round: 3.1 -> 3 ||| 3.6 -> 4  (nearest)
+        // Rounding
+            .floor: 3.1 -> 3 ||| -1.1 -> -2 (down)
+            .ceil: 3.1 -> 4 ||| -1.1 -> -1  (up)
+            .round: 3.1 -> 3 ||| 3.6 -> 4  (nearest)
     
-    - isFinite and isNaN
-    - parseInt and parseFloat
+        // isFinite and isNaN
+        // parseInt and parseFloat
 
-3. String
-    - special character
-    - string are immutable
-    - indexOf ||| lastIndexOf
-    - includes  ||| startsWith ||| endsWith
-    - slice  |||  substr  ||| substring
-    - codePointAt ||| fromCodePoint
-    - locateCompare
+    // 3. String
+        // special character
+        // string are immutable
+        // indexOf ||| lastIndexOf
+        // includes  ||| startsWith ||| endsWith
+        // slice  |||  substr  ||| substring
+        // codePointAt ||| fromCodePoint
+        // locateCompare
 
-4. Array
-    - lưu trữ có thứ tự
-    - Declaration; 2 cách
-    - pop ||| push, shift ||| unshift
-    - for ||| for..in
-    - method
-        + add/remove items: 
-            + splice[start, deleteCount, ele1...eleN]: xóa deleteCount p/tử từ start và thêm vào ele1..eleN
+    // 4. Array
+        // lưu trữ có thứ tự
+        // Declaration; 2 cách
+        pop() ||| push(), shift() ||| unshift()
+        for() ||| for..in
+        // method
+            // add/remove items: 
+                splice[start, deleteCount, ele1...eleN] //xóa deleteCount p/tử từ start và thêm vào ele1..eleN
+            
+                slice[start, end] //copy vào array mới từ start --> end( not include end)
+
+                concat(arg1, arg2,...) // tạo ra arr mới từ arr cũ và có thêm arg1,arg2,...
         
-            + slice[start, end]: copy vào array mới từ start --> end( not include end)
-
-            + concat(arg1, arg2,...): tạo ra arr mới từ arr cũ và có thêm arg1,arg2,...
+            // Search in array
+                indexOf()/lastIndexOf()/includes()
+                find/findIndex()/findLastIndex()
+                filter()
         
-        + Search in array
-            + indexOf/lastIndexOf/includes
-            + find/findIndex/findLastIndex
-            + filter
-        
-        + transform an array
-            + map
-            + sort(n)
-            + reverse
-            + split / join
-            + reduce / reduceRight
+            // transform an array
+                map()
+                sort(n)
+                reverse()
+                split() / join()
+                reduce() / reduceRight()
 
-5. Iterables
-- Symbol.iterator
+    // 5. Iterables
+        // Symbol.iterator
     
-6. Map and Set
-- khác nhau của Map và Object: Map có thể sử dụng bất kì loại key nào(string,number,boolean)
-- method
-    + new Map()
-    + set(key, value)
-    + get(key) --> value of key / undefined
-    + has(key) --> true / false
-    + delete(key)
-    + clear()
-    + size()
+    // 6. Map and Set
+        // khác nhau của Map và Object: Map có thể sử dụng bất kì loại key nào(string,number,boolean)
+        // method
+            new Map()
+            set(key, value)
+            get(key) --> value of key / undefined
+            has(key) --> true / false
+            delete(key)
+            clear()
+            size()
 
 - loop Map:
     + keys()
@@ -120,7 +119,7 @@ Immutable Infrastructure để đảm bảo tính
 - Nested Destructuring
 10. Date and time
 11. JSON method
-
+```
 4. Interaction: alert, prompt, confirm
 - alert: show ra thông báo có nút ok
 

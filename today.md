@@ -9,13 +9,125 @@
 
 ====ADVanced====
 
+# 9. Sequence Types
+## 9.1 Sequences
+```py
+# A sequence is a positionally ordered collection of items. And you can refer to any item in the sequence by using its index number e.g., s[0] and s[1]
+# The mutable sequence types are lists and bytearrays 
+#  the immutable sequence types are strings, tuples, range, and bytes.
+# In a homogeneous sequence, all elements have the same type [strings are homogeneous sequences where each element is of the same type]
+# heterogeneous sequences where you can store elements of different types[List: integer, strings, objects, etc]
+
+# Sequence type vs iterable type
+## an iterable may not be a sequence type [a set is iterable but it’s not a sequence]
+## An iterable is a collection of objects where you can get each element one by one [a list is iterable.]
+
+# sequence methods
+len(seq)
+cities = ['San Francisco', 'New York', 'Washington DC']
+print(len(cities))  # 3
 
 
+element in seq
+cities = ['San Francisco', 'New York', 'Washington DC']
+print('New York' in cities) # true
+print('New York' not in cities) # false
 
 
-7. Decorators
-8. Named Tuples
-9. Sequence Types
+seq.index(e)
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(numbers.index(5))    # 2
+
+# tìm e xuất hiện lần đầu sau i
+seq.index(e, i)
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(numbers.index(5, 3))  # 4
+
+
+seq.index(e, i, j)
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(numbers.index(5, 3, 5))   # 4
+
+seq[i:j]
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(numbers[2:6]) # [5, 3, 5, 7]
+
+# slice from i too not include j by k step
+seq[i:j:k]
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(numbers[2:6:2])   # [5,5]
+
+numbers = [1, 4, 5, 3, 5, 7, 8, 5]
+print(min(numbers))  # 1
+print(max(numbers))  # 8
+
+s3 = s1 + s2
+east = ['New York', 'New Jersey']
+west = ['San Diego', 'San Francisco']
+cities = east + west
+print(cities)   # ['New York', 'New Jersey', 'San Diego', 'San Francisco']
+
+
+city = [['San Francisco', 900_000]]
+cities = city + city
+
+print(cities)   # [['San Francisco', 1000000], ['San Francisco', 1000000]]
+print(id(cities[0]) == id(cities[1]))  # True
+
+city[0][1] = 1_000_000
+print(cities)   # [['San Francisco', 1000000], ['San Francisco', 1000000]]
+
+
+s = 'ha'
+print(s*3)  # hahaha
+
+```
+## 9.2 Tuple vs List
+```py
+# A tuple is immutable while a list is mutable
+## list
+fruits = ['apple', 'orange', 'banana']
+fruits[0] = 'strawberry'
+print(fruits)   # ['strawberry', 'orange', 'banana']
+
+## tuple
+fruits = ('apple', 'orange', 'banana')
+fruits[0] = 'strawberry'
+### => TypeError: 'tuple' object does not support item assignment
+### can reference a new tuple
+fruits = ('apple', 'orange', 'banana')
+fruits = ('strawberry', 'orange', 'banana')
+
+fruits = ('apple', 'orange', 'banana')
+print(hex(id(fruits)))  # 0x1c018286e00
+
+fruits = ('strawberry', 'orange', 'banana')
+print(hex(id(fruits)))  # 0x1c018286e40
+
+# The storage efficiency of a tuple is greater than a list
+from sys import getsizeof
+
+fruits = ['apple', 'orange', 'banana']
+print(f'The size of the list is {getsizeof(fruits)} bytes.')    # The size of the list is 80 bytes.
+
+fruits = ('strawberry', 'orange', 'banana')
+print(f'The size of the tuple is {getsizeof(fruits)} bytes.')   # The size of the tuple is 64 bytes
+
+# Copying a tuple is faster than a list
+## copy list =>create new list
+## copy tuple => reuse an existing tuple => tuples are immutable
+fruit_tuple = ('apple', 'orange', 'banana')
+fruit_tuple2 = tuple(fruit_tuple)
+print(id(fruit_tuple) == id(fruit_tuple2))  # True
+
+fruit_list = ['apple', 'orange', 'banana']
+fruit_list2 = list(fruit_list)
+print(id(fruit_list) == id(fruit_list2))  # False
+
+```
+## 9.3 Slicing 
+```py
+```
 10. Iterators and Iterables
 11. Generators
 12. Context Managers

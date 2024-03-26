@@ -576,3 +576,233 @@ print(m3(10))   # 30
 ### WHY??
 ### FIX
 ```
+# 7. Decorators
+## 7.1 decorators
+```py
+# là 1 fn lấy 1 fn khác làm argument(đối số) và extend behavior của fn mà ko thay đổi fn ban đầu
+
+# Ex:
+def net_price(price, tax):
+    return price * (1 + tax)
+
+### Decorator Function: currency fn return về wrapper fn. trong wrapper có cá tham số cho phép gọi bất kì fn function nào với bất kì sự kết hợp nào
+def currency(fn):
+    # wrapper thực thi hành vi của fn
+    def wrapper(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        return f'${result}'
+    return wrapper
+# ==> currency là 1 @decorators
+net_price = currency(net_price)
+print(net_price(100, 0.05))     # $105.0
+
+# 1 hàm lấy hàm khác làm đối số và trả về hàm khác
+# closure chấp nhận sự kết hợp của positional and keyword-only argument
+# closure fn gọi original fn = sử dụng các đối số cho closure fn và return result của fn 
+
+# '@'
+net_price = currency(net_price)
+## or
+fn = decorate(fn)
+@decorare
+def fn():
+    pass
+
+## ex:
+def currency(fn):
+    def wrapper(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        return f'${result}'
+    return wrapper
+
+@currency
+def net_price(price, tax):
+    return price * (1 + tax)
+
+print(net_price(100, 0.05))
+
+# Introspecting decorated functions
+@decorate
+def fn(*args,**kwargs):
+    pass
+## bằng với việc:
+fn = decorate(fn)
+
+## won’t see the documentation of the original function
+help(net_price) # wrapper(*args, **kwargs)
+                # None
+print(net_price.__name__)   # wrapper
+
+## => decorate a function, you’ll lose the original function signature and documentation
+
+## FIX: use @wraps
+from functools import wraps
+
+def currency(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        result = fn(*args, **kwargs)
+        return f'${result}'
+    return wrapper
+
+@currency
+def net_price(price, tax):
+    return price * (1 + tax)
+
+help(net_price)
+print(net_price.__name__)
+## output:
+# net_price(price, tax)
+#     calculate the net price from price and tax
+#     Arguments:
+#         price: the selling price
+#         tax: value added tax or sale tax
+#     Return
+#         the net price
+
+# net_price    
+```
+## 7.2 Decorator with Arguments
+```py
+# hard-coded value 5
+from functools import wraps
+
+def repeat(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        for _ in range(5):
+            result = fn(*args, **kwargs)
+        return result
+
+    return wrapper
+
+
+@repeat
+def say(message):
+    print(message)
+
+say('Hello')
+
+## FIX : flexible
+from functools import wraps
+
+def repeat(times):
+    ''' call a function a number of times '''
+    ## decorate() tương đương với original repeat()
+    def decorate(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                result = fn(*args, **kwargs)
+            return result
+        return wrapper
+    return decorate
+
+@repeat(10)
+def say(message):
+    print(message)
+
+say('Hello')
+
+## ==> repeat không phải decorator mà là decorator factory nó sẻ trả về 1 decorator
+```
+## 7.3 class decorator
+```py
+# can make the __call__ method as a decorator
+from functools import wraps
+
+
+class Star:
+    def __init__(self, n):
+        self.n = n
+
+    def __call__(self, fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            print(self.n*'*')
+            result = fn(*args, **kwargs)
+            print(result)
+            print(self.n*'*')
+            return result
+        return wrapper
+
+
+@Star(5)
+def add(a, b):
+    return a + b
+
+
+add(10, 20)
+
+# => Use callable classes as decorators by implementing the __call__ method
+# => Pass the decorator arguments to the __init__ method
+
+```
+## 7.4 Monkey patching
+```py
+# Monkey Patching là một kỹ thuật cho phép bạn sửa đổi hoặc mở rộng hoạt động của các modules, class hoặc function hiện có trong thời gian chạy mà không thay đổi original source code
+# cách làm
+## xác định target 
+## create patch by writing: add, modify, replace existing logic
+## apply the patch. patch overwrite or extend
+```
+# 8. Named Tuples
+## 8.1 NamedTuple
+```py
+# tuple + class = Named tuple [cho phép tạo tuple và gán tên có ý nghĩa cho các p/tử]
+# là subclass của tuple, no thêm các property name vào vị trí element
+
+from collections import namedtuple
+## namedtuple => return new name tuple class[class factory]
+
+Point2D = namedtuple('Point2D',['x','y'])
+#or
+Point2D = namedtuple('Point2D',('x','y'))
+#or 
+Point2D = namedtuple('Point2D',('x, y'))
+# or
+Point2D = namedtuple('Point2D','x y')
+
+# Instantiating named tuples
+point = Point2D(100, 200)
+#or
+point = Point2D(x=100, y=200)
+
+# ex:
+## unpacking
+x, y = point
+print(f'({x}, {y})')  # (100, 200)
+
+## indexing
+x = point[0]
+y = point[1]
+print(f'({x}, {y})')  # (100, 200)
+
+## iterating
+
+for coordinate in point:
+    print(coordinate)   # 100, then 200
+
+# The rename argument of the namedtuple function
+## accepts the rename the keyword-only argument that allows you to rename invalid field names
+from collections import namedtuple
+
+Circle = namedtuple(
+    'Circle',
+    'center_x, center_y, _radius',
+    rename=True
+)
+print(Circle._fields)   # ('center_x', 'center_y', '_2')
+# => the namedtuple function changes the _radius field to _2 automatically
+
+# ex:
+a = Point2D(100, 200)
+b = Point2D(100, 200)
+
+print(a == b)  # True
+print(a)    # Point2D(x=100, y=200)
+
+# Named tuples are tuples whose element positions have meaningful names
+# Use the namedtuple function of the collections standard library to create a named tuple class
+# Named tuples are immutable
+``` 
